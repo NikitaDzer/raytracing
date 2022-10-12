@@ -43,7 +43,7 @@ void Ray::set_origin( const Vector &origin) { origin_ = origin; }
 void Ray::set_dir   ( const Vector &dir)    { dir_    = dir;    }
 
 
-bool          Ray::infinity() const { return sphere_ == NULL; }
+bool          Ray::infinite() const { return sphere_ == NULL; }
 const Sphere &Ray::reached()  const { return *sphere_; }
 
 Ray Ray::reflect() const

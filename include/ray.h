@@ -38,7 +38,7 @@ class Ray
 	void set_dir   ( const Vector &dir);
 	
 	
-	bool          infinity() const;
+	bool          infinite() const;
 	Ray           reflect()  const;
 	const Sphere &reached()  const;
 	

@@ -11,7 +11,7 @@ Scene::Scene():
 	texture_(),
 	sprite_ (),
 
-	light_(),
+	lights_(),
 	spheres_()
 {	
 	pixels_ = (sf::Uint8 *)calloc( WINDOW_WIDTH * WINDOW_HEIGHT * N_RGBA_ELEMS, sizeof(sf::Uint8));
@@ -24,11 +24,11 @@ Scene::Scene():
 	texture_.create( WINDOW_WIDTH, WINDOW_HEIGHT);
 	sprite_.setTexture( texture_);
 
-	light_.set_origin( Vector( -500, -500, -500));
-	light_.set_color ( Color ( 255, 255,  255));
+	lights_.push_back( Light( Vector( -500, -500, -500), Color( 255, 255, 255)));
+	lights_.push_back( Light( Vector( -500,  200, -400), Color( 255, 255, 255)));
 
-	spheres_.push_back( Sphere( Vector(  0, 0,  50), Color( 255,   0, 255),     50.f));
-	spheres_.push_back( Sphere( Vector(  0, 0,  300), Color( 255, 255, 255),  200.f));
+	spheres_.push_back( Sphere( Vector( 0, 0,  50), Color( 255,   0, 255),   50.f));
+	spheres_.push_back( Sphere( Vector( 0, 0, 300), Color( 255, 255, 255),  200.f));
 }
 
 
@@ -71,38 +71,40 @@ void Scene::render( const Camera &camera, sf::RenderWindow &window)
 		for ( uint32_t x = 0; x < WINDOW_WIDTH; x++ )
 		{
 			Ray ray = camera.emit( x, y);
-			Color color = { 10, 10, 10 };
+			Color color = { 0, 0, 0 };
 			
 			ray.intersect( spheres_);
 
-			if ( !ray.infinity() )
-			{	
-				
-				const Sphere &sphere    = ray.reached();
-				      Ray     refl_ray  = ray.reflect();
-				      Ray     light_ray = light_.emit( refl_ray.get_origin());
-				
-				light_ray.reach( spheres_, &sphere);
+			if ( ray.infinite() )
+			{
+				color = Color( 10, 10, 10);
+			}
+			else
+			{
+				const Sphere &sphere       = ray.reached();
+				      Ray     refl_ray     = ray.reflect();
+				const Vector &intersection = refl_ray.get_origin();
 
-				
-				if ( !light_ray.infinity() && light_ray.reflect().get_origin() != refl_ray.get_origin() )
+				for ( uint32_t i = 0; i < lights_.size(); i++ )
 				{
-					color = Color( 0, 0, 0);
-				}
-				else
-				{
-					color = Color( 0, 0, 0);
+					Light &light     = lights_[i];
+					Ray    light_ray = light.emit( intersection);
 
-					const float diff_cos = (-1) * (light_ray.get_dir().normalize() & (refl_ray.get_origin() - sphere.get_coords()).normalize());
-					if ( diff_cos > 0 )
-					{
-						color += Color::calc_color( light_.get_color(), sphere.get_material(), 0.3f * diff_cos);
-					}
+					light_ray.reach( spheres_, &sphere);
 					
-					const float spec_cos = (-1) * (light_ray.get_dir().normalize() & refl_ray.get_dir().normalize());
-					if ( spec_cos > 0 )
-					{
-						color += light_.get_color() * 0.3f * pow( spec_cos, 20);
+					if ( !light_ray.infinite() && light_ray.reflect().get_origin() == intersection )
+					{		
+						const float diff_cos = (-1) * (light_ray.get_dir().normalize() & (refl_ray.get_origin() - sphere.get_coords()).normalize());
+						if ( diff_cos > 0 )
+						{
+							color += Color::calc_color( light.get_color(), sphere.get_material(), 0.3f * diff_cos);
+						}
+						
+						const float spec_cos = (-1) * (light_ray.get_dir().normalize() & refl_ray.get_dir().normalize());
+						if ( spec_cos > 0 )
+						{
+							color += light.get_color() * 0.3f * pow( spec_cos, 20);
+						}
 					}
 				}	
 			}
@@ -111,7 +113,7 @@ void Scene::render( const Camera &camera, sf::RenderWindow &window)
 		}
 	}
 
-	light_.set_origin( light_.get_origin() + Vector( 10, 10, 0));
+	lights_[0].set_origin( lights_[0].get_origin() + Vector( 10, 10, 0));
 
 	texture_.update( pixels_);
 }

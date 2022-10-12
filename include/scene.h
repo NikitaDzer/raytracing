@@ -22,7 +22,7 @@ class Scene
 	sf::Texture  texture_;
 	sf::Sprite   sprite_;
 	    
-	Light light_;
+	std::vector<Light>  lights_;
 	std::vector<Sphere> spheres_;
 
 	void set_pixel( const uint32_t x, const uint32_t y, const Color &color);
