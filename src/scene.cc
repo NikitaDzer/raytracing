@@ -24,8 +24,8 @@ Scene::Scene():
 	texture_.create( WINDOW_WIDTH, WINDOW_HEIGHT);
 	sprite_.setTexture( texture_);
 
-	lights_.push_back( Light( Vector( -500, -500, -500), Color( 255, 255, 255)));
-	lights_.push_back( Light( Vector( -500,  200, -400), Color( 255, 255, 255)));
+	lights_.push_back( Light( Vector( -300, -100, -500), Color( 255, 255, 255)));
+	lights_.push_back( Light( Vector( -500,  300, -500), Color( 255, 255, 255)));
 
 	spheres_.push_back( Sphere( Vector( 0, 0,  50), Color( 255,   0, 255),   50.f));
 	spheres_.push_back( Sphere( Vector( 0, 0, 300), Color( 255, 255, 255),  200.f));
@@ -83,30 +83,31 @@ void Scene::render( const Camera &camera, sf::RenderWindow &window)
 			{
 				const Sphere &sphere       = ray.reached();
 				      Ray     refl_ray     = ray.reflect();
-				const Vector &intersection = refl_ray.get_origin();
 
 				for ( uint32_t i = 0; i < lights_.size(); i++ )
 				{
 					Light &light     = lights_[i];
-					Ray    light_ray = light.emit( intersection);
+					Ray    light_ray = light.emit( ray.intersection());
 
 					light_ray.reach( spheres_, &sphere);
 					
-					if ( !light_ray.infinite() && light_ray.reflect().get_origin() == intersection )
-					{		
-						const float diff_cos = (-1) * (light_ray.get_dir().normalize() & (refl_ray.get_origin() - sphere.get_coords()).normalize());
+					if ( !light_ray.infinite() && light_ray.intersection() == ray.intersection() )
+					{	
+						
+						const float diff_cos = (-1) * (light_ray.dir() & (ray.intersection() - sphere.get_coords()).normalize());
 						if ( diff_cos > 0 )
 						{
 							color += Color::calc_color( light.get_color(), sphere.get_material(), 0.3f * diff_cos);
 						}
-						
-						const float spec_cos = (-1) * (light_ray.get_dir().normalize() & refl_ray.get_dir().normalize());
+							
+						const float spec_cos = (-1) * (light_ray.dir() & refl_ray.dir());
 						if ( spec_cos > 0 )
 						{
 							color += light.get_color() * 0.3f * pow( spec_cos, 20);
 						}
+					
 					}
-				}	
+				}
 			}
 
 			set_pixel( x, y, color);	
@@ -114,6 +115,8 @@ void Scene::render( const Camera &camera, sf::RenderWindow &window)
 	}
 
 	lights_[0].set_origin( lights_[0].get_origin() + Vector( 10, 10, 0));
+
+	
 
 	texture_.update( pixels_);
 }

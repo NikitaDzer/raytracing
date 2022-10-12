@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -O1 -g
+CFLAGS = -O3
 SFML_FLAGS = -lsfml-graphics -lsfml-window -lsfml-system
 
 SRC_DIR   = ./src

@@ -30,5 +30,5 @@ void Light::set_color ( const Color  &color)  { color_  = color;  }
 
 Ray Light::emit( const Vector &coords) const
 {
-	return Ray( origin_, coords - origin_);
+	return Ray( origin_, coords - origin_, color_);
 }

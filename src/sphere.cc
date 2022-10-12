@@ -36,7 +36,7 @@ void Sphere::set_coords  ( const Vector &coords)   { coords_   = coords;   }
 void Sphere::set_material( const Color  &material) { material_ = material; }
 void Sphere::set_radius  ( const float   radius)   { radius_   = radius;   }
 
-
+/*
 bool Sphere::intersect( const Ray &ray, Ray &refl_ray) const 
 {
 	const Vector ray_origin = ray.get_origin();
@@ -65,7 +65,7 @@ bool Sphere::intersect( const Ray &ray, Ray &refl_ray) const
 
 	return false;
 }
-
+*/
 
 void Sphere::print() const
 {

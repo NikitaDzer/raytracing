@@ -39,5 +39,5 @@ Ray Camera::emit( const uint32_t x, const uint32_t y) const
 	dir.set_y( coords_.get_y() + shift_y);
 	dir.set_z( coords_.get_z() * (-1));
 
-	return Ray( origin, dir);
+	return Ray( origin, dir, Color( 0, 0, 0));
 }
