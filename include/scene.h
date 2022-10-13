@@ -25,15 +25,16 @@ class Scene
 	std::vector<Light>  lights_;
 	std::vector<Sphere> spheres_;
 
-	void set_pixel( const uint32_t x, const uint32_t y, const Color &color);
+	void    set_pixel( const uint32_t x, const uint32_t y, const Color  &color);
+	void render_pixel( const uint32_t x, const uint32_t y, const Camera &camera); 
 
 
     public:
 	Scene();
 	~Scene();
 
-	void render( const Camera &camera, sf::RenderWindow &window);
-	void draw( sf::RenderWindow &window);
+	void render( const Camera &camera);
+	void draw  ( sf::RenderWindow &window);
 
 	void print() const;
 };

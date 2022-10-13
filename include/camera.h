@@ -25,7 +25,7 @@ class Camera
 	const Vector &coords() const;
 
 	void coords( const Vector &coords);	
-
+	void move  ( const Vector &vector);
 	
 	Ray emit( const uint32_t x, const uint32_t y) const;
 };

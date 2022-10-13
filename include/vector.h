@@ -25,11 +25,12 @@ class Vector
 		float get_z()   const;
 		float get_len() const;
 
-		void set_x( const float x);
-		void set_y( const float y);
-		void set_z( const float z);
+		void set_x  ( const float x);
+		void set_y  ( const float y);
+		void set_z  ( const float z);
+		void set_len( const float len);
 
-		float calc_len();
+		float calc_len() const;
 	};
 
 
@@ -69,8 +70,8 @@ class Vector
 	void set_z( const float z);
 	void set  ( const float x, const float y, const float z);
 
-
-	Vector normalize() const;
+	float  cos( const Vector &vector) const;
+	Vector normalize()                const;
 
 	void print() const;
 };

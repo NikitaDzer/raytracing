@@ -69,7 +69,7 @@ class Ray
 	const Sphere &reached()      const;
 	const Vector &intersection() const;
 
-	void reach    ( const std::vector<Sphere> &spheres, const Sphere *const sphere);
+	void reach    ( const Sphere *const sphere, const std::vector<Sphere> &spheres);
 	void intersect( const std::vector<Sphere> &spheres);
 
 

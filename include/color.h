@@ -24,8 +24,10 @@ class Color
 
 	
 	Color  operator +  ( const Color &color) const;
-	Color &operator += ( const Color &color);
 	
+	Color &operator += ( const Color &color);
+	Color &operator *= ( const float  fac);
+
 	uint8_t get_red()   const;
 	uint8_t get_green() const;
 	uint8_t get_blue()  const;

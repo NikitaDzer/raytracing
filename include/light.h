@@ -2,6 +2,8 @@
 #define LIGHT_H
 
 
+#include <vector>
+
 #include "vector.h"
 #include "color.h"
 #include "ray.h"
@@ -30,8 +32,9 @@ class Light
 	void set_color ( const Color  &color);
 
 	
-	Ray emit( const Vector &coords) const;
-	
+	Ray   emit    ( const Vector &coords)                               const;
+	Color colorize( const Ray &ray, const std::vector<Sphere> &spheres) const; 
+
 
 	void print() const;
 };

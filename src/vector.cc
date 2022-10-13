@@ -24,7 +24,10 @@ Vector::Kernel::Kernel( const Vector::Kernel &kern):
 
 Vector::Kernel::~Kernel()
 {
-	assert( isnan( len_) || (x_ * x_ + y_ * y_ + z_ * z_ == len_ * len_)); 
+	if ( 0 )
+	{	// WTF ( what terrible failure, of course )
+		assert( isnan( len_) || ((float)(x_ * x_ + y_ * y_ + z_ * z_) == len_ * len_)); 
+	}
 }
 
 
@@ -33,16 +36,14 @@ float Vector::Kernel::get_y()   const { return y_;   }
 float Vector::Kernel::get_z()   const { return z_;   }
 float Vector::Kernel::get_len() const { return len_; }
 
-void Vector::Kernel::set_x( const float x) { x_ = x; len_ = NAN; }
-void Vector::Kernel::set_y( const float y) { y_ = y; len_ = NAN; }
-void Vector::Kernel::set_z( const float z) { z_ = z; len_ = NAN; }
+void Vector::Kernel::set_x  ( const float x)   { x_ = x; len_ = NAN; }
+void Vector::Kernel::set_y  ( const float y)   { y_ = y; len_ = NAN; }
+void Vector::Kernel::set_z  ( const float z)   { z_ = z; len_ = NAN; }
+void Vector::Kernel::set_len( const float len) {         len_ = len; } 
 
-float Vector::Kernel::calc_len()
+float Vector::Kernel::calc_len() const
 {
-	if ( !isnan( len_) )
-		return len_;
-
-	return len_ = sqrtf( x_ * x_ + y_ * y_ + z_ * z_);
+	return sqrtf( x_ * x_ + y_ * y_ + z_ * z_);
 }
 
 
@@ -64,9 +65,9 @@ Vector::~Vector()
 
 bool Vector::operator == ( const Vector &vec) const
 {
-	return    fabs( get_x() - vec.get_x() ) < 1.f 
-	       && fabs( get_y() - vec.get_y() ) < 1.f 
-	       && fabs( get_z() - vec.get_z() ) < 1.f;
+	return    fabs( get_x() - vec.get_x() ) < 0.1f 
+	       && fabs( get_y() - vec.get_y() ) < 0.1f 
+	       && fabs( get_z() - vec.get_z() ) < 0.1f;
 }
 
 bool Vector::operator != ( const Vector &vec) const
@@ -158,7 +159,15 @@ float Vector::get_x() const { return kern_.get_x(); }
 float Vector::get_y() const { return kern_.get_y(); }
 float Vector::get_z() const { return kern_.get_z(); }
 
-float Vector::get_len() { return kern_.calc_len(); }
+float Vector::get_len() 
+{ 
+	if ( isnan( kern_.get_len()) ) 
+	{ 
+		kern_.set_len( kern_.calc_len()); 
+	}
+
+	return kern_.get_len();
+}
 
 
 void Vector::set_x( const float x) { kern_.set_x( x); }
@@ -173,17 +182,46 @@ void Vector::set( const float x, const float y, const float z)
 }
 
 
+float Vector::cos( const Vector &vector) const
+{
+	float len1 = 0.f;
+	float len2 = 0.f;
+
+	if ( isnan( kern_.get_len()) )
+	{
+		len1 = kern_.calc_len();
+	}
+	else
+	{
+		len1 = kern_.get_len();
+	}
+
+	if ( isnan( vector.kern_.get_len()) )
+	{
+		len2 = vector.kern_.calc_len(); 
+	}
+	else
+	{
+		len2 = vector.kern_.get_len();
+	}
+
+	return (*this & vector) / (len1 * len2);
+}
+
 Vector Vector::normalize() const
 {
-	Vector normalized = { *this };
-	const float len   = normalized.get_len();
-	
+	const float  len        = kern_.calc_len();
+	      Vector normalized = {};
+
 	normalized.set_x( get_x() / len);
 	normalized.set_y( get_y() / len);
 	normalized.set_z( get_z() / len);
+
+	normalized.get_len();
 	
 	return normalized;
 }
+
 
 void Vector::print() const
 {

@@ -70,8 +70,8 @@ void Ray::color ( const Color  &color)  { kern_.set_color ( color);           }
 
 
 bool          Ray::infinite()     const { return sphere_ == NULL; }
-const Sphere &Ray::reached()      const { return *sphere_; }
-const Vector &Ray::intersection() const { return intersection_; }
+const Sphere &Ray::reached()      const { return *sphere_;        }
+const Vector &Ray::intersection() const { return intersection_;   }
 
 Ray Ray::reflect() const
 {
@@ -92,7 +92,7 @@ Ray Ray::reflect() const
 }
 
 
-void Ray::reach( const std::vector<Sphere> &spheres, const Sphere *const sphere)
+void Ray::reach( const Sphere *const sphere,  const std::vector<Sphere> &spheres)
 {
 	float min_distance = FLT_MAX;
 
@@ -109,7 +109,7 @@ void Ray::reach( const std::vector<Sphere> &spheres, const Sphere *const sphere)
 		QuadraticRoots roots = { 0 };
 
 		solveQuadratic( a, b, c, &roots);
-		if ( roots.numberOfRoots >= 1 && min_distance > roots.x1 )
+		if ( roots.numberOfRoots >= 1 && roots.x1 > 0.f && min_distance > roots.x1 )
 		{
 			min_distance = roots.x1;
 			sphere_      = &sphere;
@@ -139,7 +139,7 @@ void Ray::intersect( const std::vector<Sphere> &spheres)
 		QuadraticRoots roots = { 0 };
 
 		solveQuadratic( a, b, c, &roots);
-		if ( roots.numberOfRoots >= 1 && min_distance > roots.x1 )
+		if ( roots.numberOfRoots >= 1 && roots.x1 > 0.f && min_distance > roots.x1 )
 		{
 			min_distance = roots.x1;
 			sphere_      = &sphere;

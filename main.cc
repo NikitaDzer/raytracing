@@ -14,7 +14,7 @@ int main()
 	sf::RenderWindow window = {};
 	init_window( window);
 
-	Camera camera = Vector( 0, 0, -500);
+	Camera camera = Vector( 0, 0, -100);
 	Scene  scene  = {};
 
 	while ( window.isOpen() )
@@ -25,11 +25,41 @@ int main()
 			break;
 		}
 
-		scene.render( camera, window);
+		if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::Left) )
+		{
+			camera.move( Vector( -10, 0, 0));
+		}
+
+		if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::Right) )
+		{
+			camera.move( Vector( 10, 0, 0));
+		}
+
+		if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::Up) )
+		{
+			camera.move( Vector( 0, 0, 10));
+		}
+
+		if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::Down) )
+		{
+			camera.move( Vector( 0, 0, -10));
+		}
+
+		if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::U) )
+		{
+			camera.move( Vector( 0, -10, 0));
+		}
+
+		if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::D) )
+		{
+			camera.move( Vector( 0, 10, 0));
+		}
+
+		scene.render( camera);
 		scene.draw  ( window);
 		window.display();
 
-		// camera.coords( camera.coords() +  Vector( 0, 0, 0));
+		// camera.coords( camera.coords() +  Vector( 5, 5, 5));
 	}
 	
 	return 0;

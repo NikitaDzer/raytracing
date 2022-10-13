@@ -62,6 +62,11 @@ Color &Color::operator += ( const Color &color)
 	return *this;
 }
 
+Color &Color::operator *= ( const float fac)
+{
+	return *this = *this * fac;
+}
+
 
 void Color::print() const
 {

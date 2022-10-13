@@ -24,8 +24,8 @@ Camera::~Camera()
 
 const Vector &Camera::coords() const { return coords_; }
 
-void Camera::coords( const Vector &coords) { coords_ = coords; }
-
+void Camera::coords( const Vector &coords) { coords_  = coords; }
+void Camera::move  ( const Vector &vector) { coords_ += vector; }
 
 Ray Camera::emit( const uint32_t x, const uint32_t y) const
 {
