@@ -2,7 +2,7 @@
 #include "../include/camera.h"
 
 
-static constexpr float REVERSE_FOV = 0.002f;
+static constexpr float REVERSE_FOV = 0.001f;
 
 
 Camera::Camera():
@@ -40,4 +40,38 @@ Ray Camera::emit( const uint32_t x, const uint32_t y) const
 	dir.set_z( coords_.get_z() * (-1));
 
 	return Ray( origin, dir, Color( 0, 0, 0));
+}
+
+
+void Camera::handle_keyboard( Camera &camera)
+{
+	if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::Left) )
+	{
+		camera.move( Vector( -10, 0, 0));
+	}
+
+	if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::Right) )
+	{
+		camera.move( Vector( 10, 0, 0));
+	}
+
+	if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::Up) )
+	{
+		camera.move( Vector( 0, 0, 10));
+	}
+
+	if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::Down) )
+	{
+		camera.move( Vector( 0, 0, -10));
+	}
+
+	if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::U) )
+	{
+		camera.move( Vector( 0, -10, 0));
+	}
+
+	if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::D) )
+	{
+		camera.move( Vector( 0, 10, 0));
+	}
 }

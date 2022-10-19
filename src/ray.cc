@@ -2,6 +2,7 @@
 #include <float.h>
 
 #include "../include/window.h"
+#include "../include/common.h"
 #include "../include/ray.h"
 #include "../utils/quadratic.h"
 
@@ -82,7 +83,7 @@ Ray Ray::reflect() const
 	
 	Vector refl_origin = intersection_;
 	Vector refl_dir    = incident - (2 * (incident & normal)) * normal;
-	Color  refl_color  = Color::calc_color( color(), sphere_->get_material(), 1.f);
+	Color  refl_color  = Color::calc_color( color(), sphere_->get_material().color(), 1.f);
 
 	refl_ray.origin( refl_origin);
 	refl_ray.dir   ( refl_dir);
@@ -96,11 +97,10 @@ void Ray::reach( const Sphere *const sphere,  const std::vector<Sphere> &spheres
 {
 	float min_distance = FLT_MAX;
 
-	for ( uint32_t i = 0; i < spheres.size(); i++ )
-	{
-		const Sphere &sphere = spheres[i];
-		const float   radius = sphere.get_radius(); 
-		const Vector  tmp    = origin() - sphere.get_coords();
+	for ( std::vector<Sphere>::const_iterator spheres_it = spheres.begin(); spheres_it != spheres.end(); spheres_it++ )
+	{	
+		const float   radius = spheres_it->get_radius(); 
+		const Vector  tmp    = origin() - spheres_it->get_coords();
 
 		const float a = (dir() & dir());
 	       	const float b = 2 * (dir() & tmp);
@@ -112,7 +112,7 @@ void Ray::reach( const Sphere *const sphere,  const std::vector<Sphere> &spheres
 		if ( roots.numberOfRoots >= 1 && roots.x1 > 0.f && min_distance > roots.x1 )
 		{
 			min_distance = roots.x1;
-			sphere_      = &sphere;
+			sphere_      = &(*spheres_it);
 		}
 	}
 
@@ -125,12 +125,11 @@ void Ray::reach( const Sphere *const sphere,  const std::vector<Sphere> &spheres
 void Ray::intersect( const std::vector<Sphere> &spheres)
 {
 	float min_distance = FLT_MAX;
-
-	for ( uint32_t i = 0; i < spheres.size(); i++ )
+	
+	for ( std::vector<Sphere>::const_iterator spheres_it = spheres.begin(); spheres_it != spheres.end(); spheres_it++ )
 	{
-		const Sphere &sphere = spheres[i];
-		const float   radius = sphere.get_radius(); 
-		const Vector  tmp    = origin() - sphere.get_coords();
+		const float   radius = spheres_it->get_radius(); 
+		const Vector  tmp    = origin() - spheres_it->get_coords();
 
 		const float a = (dir() & dir());
 	       	const float b = 2 * (dir() & tmp);
@@ -142,7 +141,7 @@ void Ray::intersect( const std::vector<Sphere> &spheres)
 		if ( roots.numberOfRoots >= 1 && roots.x1 > 0.f && min_distance > roots.x1 )
 		{
 			min_distance = roots.x1;
-			sphere_      = &sphere;
+			sphere_      = &(*spheres_it);
 		}
 	}
 
@@ -165,4 +164,74 @@ void Ray::print() const
 	
 	printf( "-^- Ray -^-\n");
 	*/
+}
+
+
+Color Ray::primary( Ray &primary_ray, const std::vector<Sphere> &spheres, const std::vector<Light> &lights)
+{
+	Color color = {};
+
+	primary_ray.intersect( spheres);
+
+	if ( primary_ray.infinite() )
+	{
+		color = Color( 30, 30, 30);
+	}
+	else
+	{
+		color = Color( 0, 0, 0);
+
+		for ( std::vector<Light>::const_iterator light = lights.begin(); light != lights.end(); light++ )
+		{
+			color += light->colorize( primary_ray, spheres, COLORIZE_FULL);
+		}
+	}
+
+	return color;
+}
+
+
+Color recursive_secondary( Ray ray, const std::vector<Sphere> &spheres, const std::vector<Light> &lights, const float intensity)
+{
+	Color color = Color( 0, 0, 0);
+
+	if ( intensity < 0.1f )
+	{
+		return color;
+	}
+	
+	
+	ray.intersect( spheres);
+
+	if ( ray.infinite() )
+	{
+		return color;
+	}
+
+	for ( std::vector<Light>::const_iterator light = lights.begin(); light != lights.end(); light++ )
+	{
+		color += light->colorize( ray, spheres, COLORIZE_DIFFUSE);
+	}
+
+	const float albedo          = ray.reached().get_material().albedo();
+	const Color secondary_color = recursive_secondary( ray.reflect(), spheres, lights, intensity * 0.6f);
+
+	color *= 1 - albedo;
+	color += Color::calc_color( secondary_color, Color( 255, 255, 255), albedo);
+
+	return color;
+}
+
+Color Ray::secondary( const Ray &ray, const std::vector<Sphere> &spheres, const std::vector<Light> &lights)
+{
+	if ( ray.infinite() )
+	{
+		return Color( 0, 0, 0);
+	}
+
+
+	const float albedo          = ray.reached().get_material().albedo();
+	const Color secondary_color = recursive_secondary( ray.reflect(), spheres, lights, 1.0f);
+
+	return Color::calc_color( secondary_color, Color( 255, 255, 255), albedo);
 }

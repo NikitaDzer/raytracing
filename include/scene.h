@@ -33,8 +33,20 @@ class Scene
 	Scene();
 	~Scene();
 
+
+	int add( const Light  &light);
+	int add( const Sphere &sphere);
+
+	Light  &get_light ( const int index);
+	Sphere &get_sphere( const int index);	
+
+	void remove_light ( const int index);
+	void remove_sphere( const int index);
+
+
 	void render( const Camera &camera);
 	void draw  ( sf::RenderWindow &window);
+
 
 	void print() const;
 };

@@ -10,12 +10,23 @@
 
 
 class Ray;
+class Sphere;
+
+enum ColorizeType
+{
+	COLORIZE_DIFFUSE = 1,
+	COLORIZE_FULL    = 2,
+};
 
 class Light
 {
     private:
 	Vector origin_;
 	Color  color_;
+
+	Color colorize_diffuse ( const Ray &ray, const Ray &light_ray, const Sphere &sphere) const;
+	Color colorize_specular( const Ray &ray, const Ray &light_ray, const Sphere &sphere) const;
+
 
     public:
 	Light();
@@ -33,7 +44,8 @@ class Light
 
 	
 	Ray   emit    ( const Vector &coords)                               const;
-	Color colorize( const Ray &ray, const std::vector<Sphere> &spheres) const; 
+	Color colorize( const Ray &ray, const std::vector<Sphere> &spheres, 
+			const ColorizeType colorize_type)                   const; 
 
 
 	void print() const;

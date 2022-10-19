@@ -11,10 +11,10 @@ EXEC_FILE = raytracing
 all: debug
 
 debug: $(BUILD_DIR)/main.o $(BUILD_DIR)/vector.o $(BUILD_DIR)/sphere.o $(BUILD_DIR)/window.o $(BUILD_DIR)/light.o \
-       $(BUILD_DIR)/scene.o $(BUILD_DIR)/color.o $(BUILD_DIR)/ray.o $(BUILD_DIR)/camera.o $(BUILD_DIR)/quadratic.o
+       $(BUILD_DIR)/scene.o $(BUILD_DIR)/color.o $(BUILD_DIR)/ray.o $(BUILD_DIR)/camera.o $(BUILD_DIR)/quadratic.o $(BUILD_DIR)/material.o
 	$(CC) $(CFLAGS) $(SFML_FLAGS) $(BUILD_DIR)/main.o $(BUILD_DIR)/vector.o $(BUILD_DIR)/scene.o   \
 		$(BUILD_DIR)/sphere.o  $(BUILD_DIR)/window.o $(BUILD_DIR)/light.o $(BUILD_DIR)/color.o \
-        	$(BUILD_DIR)/quadratic.o $(BUILD_DIR)/ray.o $(BUILD_DIR)/camera.o -o $(EXEC_FILE)
+        	$(BUILD_DIR)/quadratic.o $(BUILD_DIR)/ray.o $(BUILD_DIR)/camera.o $(BUILD_DIR)/material.o -o $(EXEC_FILE)
 
 $(BUILD_DIR)/main.o: main.cc
 	$(CC) $(CFLAGS) -c main.cc -o $(BUILD_DIR)/main.o
@@ -43,8 +43,12 @@ $(BUILD_DIR)/ray.o: $(SRC_DIR)/ray.cc $(INC_DIR)/ray.h
 $(BUILD_DIR)/camera.o: $(SRC_DIR)/camera.cc $(INC_DIR)/camera.h
 	$(CC) $(CFLAGS) -c $(SRC_DIR)/camera.cc -o $(BUILD_DIR)/camera.o
 
+$(BUILD_DIR)/material.o: $(SRC_DIR)/material.cc $(INC_DIR)/material.h
+	$(CC) $(CFLAGS) -c $(SRC_DIR)/material.cc -o $(BUILD_DIR)/material.o
+
 $(BUILD_DIR)/quadratic.o: ./utils/quadratic.cc ./utils/quadratic.h
 	$(CC) $(CFLAGS) -c ./utils/quadratic.cc -o $(BUILD_DIR)/quadratic.o
+
 
 clean:
 	rm $(BUILD_DIR)/*.o $(EXEC_FILE)

@@ -1,5 +1,8 @@
 #include <stdlib.h>
+#include <assert.h>
 #include <math.h>
+
+#include <unistd.h>
 
 #include "../include/common.h"
 #include "../include/window.h"
@@ -23,19 +26,7 @@ Scene::Scene():
 
 	texture_.create( WINDOW_WIDTH, WINDOW_HEIGHT);
 	sprite_.setTexture( texture_);
-
-	//lights_.push_back( Light( Vector( -50, 0, -100), Color( 255, 255, 255)));
-	//lights_.push_back( Light( Vector(  50, 0, -100), Color( 255, 255, 255)));
-	//lights_.push_back( Light( Vector( 0, 0,    0), Color( 255, 255, 255)));
-	//lights_.push_back( Light( Vector( -500,  300, -500), Color( 255, 255, 255)));
-	lights_.push_back( Light( Vector(  0,  0, -200), Color( 255, 255, 255)));
-	//lights_.push_back( Light( Vector( 1000, 1000, -700), Color( 255, 255, 255))); 
-
-	spheres_.push_back( Sphere( Vector(  0, 0,     320), Color( 255, 255, 255), 200.f));
-	//spheres_.push_back( Sphere( Vector( -100, 0,   50), Color( 255, 0, 255),  50.f));
-	spheres_.push_back( Sphere( Vector(  100, 0, 50), Color(   0, 255, 255),  50.f));
 }
-
 
 Scene::~Scene()
 {
@@ -55,102 +46,49 @@ void Scene::set_pixel( const uint32_t x, const uint32_t y, const Color &color)
 
 void Scene::render_pixel( const uint32_t x, const uint32_t y, const Camera &camera)
 {
-	Color color       = {};	
+	Color color       = Color( 0, 0, 0);	
 	Ray   primary_ray = camera.emit( x, y); 
 
-	primary_ray.intersect( spheres_);
-
-	if ( primary_ray.infinite() )
-	{
-		color = Color( 30, 30, 30);
-	}
-	else
-	{
-		color = Color( 0, 0, 0);
-
-		for ( uint32_t i = 0; i < lights_.size(); i++ )
-		{
-			color += lights_[i].colorize( primary_ray, spheres_);
-		}
-
-
-		float intensity = 0.5f; 
-		Ray   ray       = primary_ray.reflect();
-		
-		while ( true )
-		{
-			Color add_color = { 0, 0, 0 };
-
-			ray.intersect( spheres_);
-
-			if ( ray.infinite() )
-			{
-				break;
-			}
-
-			for ( uint32_t i = 0; i < lights_.size(); i++ )
-			{
-				add_color += Color::calc_color( lights_[i].colorize( ray, spheres_), primary_ray.reached().get_material(), intensity);
-			}
-
-			color += add_color;
-			ray    = ray.reflect();
-
-			intensity *= 0.5f;
-
-			if ( intensity < 0.1f )
-			{
-				break;
-			}
-		}
-	
-	}
-	/*
-	while ( true )
-	{
-		Color add_color = { 0, 0, 0 };
-
-		ray.intersect( spheres_);
-
-		if ( ray.infinite() )
-		{
-			break;
-		}
-			
-		for ( uint32_t i = 0; i< lights_.size(); i++ )
-		{
-			add_color += lights_[i].colorize( ray, spheres_);
-		}	
-
-		color += add_color * intensity;
-		ray    = ray.reflect();
-		
-		intensity *= 0.1f;
-		
-		if ( intensity < 0.1f )
-		{
-			break;
-		}
-	}
-	*/
+	color += Ray::primary  ( primary_ray, spheres_, lights_);
+	color += Ray::secondary( primary_ray, spheres_, lights_);
 
 	set_pixel( x, y, color);	
 }
 
 
-/* 
- *
- * ray.reach( spheres);
- * 
- * if ( !ray.infinity() )
- * {
- *	sphere   = ray.reached();
- *	refl_ray = ray.reflect();
- *	
- *
- * }	
- *
- */
+int Scene::add( const Light &light)
+{
+	lights_.push_back( light);
+
+	return lights_.end() - lights_.begin();
+}
+
+int Scene::add( const Sphere &sphere)
+{
+	spheres_.push_back( sphere);
+
+	return spheres_.end() - spheres_.begin();
+}
+
+Light &Scene::get_light( const int index)
+{
+	return *(lights_.begin() + index);
+}
+
+Sphere &Scene::get_sphere( const int index)
+{
+	return *(spheres_.begin() + index);
+}
+
+void Scene::remove_light( const int index)
+{
+	lights_.erase( lights_.begin() + index);	
+}
+
+void Scene::remove_sphere( const int index)
+{
+	spheres_.erase( spheres_.begin() + index);
+}
 
 
 void Scene::render( const Camera &camera)
@@ -162,8 +100,6 @@ void Scene::render( const Camera &camera)
 			render_pixel( x, y, camera);
 		}
 	}
-
-	//lights_[0].set_origin( lights_[0].get_origin() + Vector( 10, 10, 0));
 
 	texture_.update( pixels_);
 }
