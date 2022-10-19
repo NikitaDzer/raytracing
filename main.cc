@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 
 #include <string.h>
+#include <unistd.h>
 
 #include "include/window.h"
 #include "include/vector.h"
@@ -14,8 +15,16 @@ int main()
 	sf::RenderWindow window = {};
 	init_window( window);
 
-	Camera camera = Vector( 0, 0, -100);
+	Camera camera = Vector( 0, 0, -300);
 	Scene  scene  = {};
+
+
+	scene.add( Light( Vector( 500, 0, -500), Color( 255, 255, 255)));
+	scene.add( Light( Vector(-500, 0, -500), Color( 255, 255, 255)));
+
+	scene.add( Sphere( Vector( 0, -50, 300), Material( Color( 255, 255, 255), 0.9f), 200.f));
+	scene.add( Sphere( Vector( 0, 200, 100), Material( Color( 255, 255,   0), 0.0f), 100.f));
+
 
 	while ( window.isOpen() )
     	{	
@@ -25,41 +34,11 @@ int main()
 			break;
 		}
 
-		if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::Left) )
-		{
-			camera.move( Vector( -10, 0, 0));
-		}
-
-		if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::Right) )
-		{
-			camera.move( Vector( 10, 0, 0));
-		}
-
-		if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::Up) )
-		{
-			camera.move( Vector( 0, 0, 10));
-		}
-
-		if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::Down) )
-		{
-			camera.move( Vector( 0, 0, -10));
-		}
-
-		if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::U) )
-		{
-			camera.move( Vector( 0, -10, 0));
-		}
-
-		if ( sf::Keyboard::isKeyPressed( sf::Keyboard::Key::D) )
-		{
-			camera.move( Vector( 0, 10, 0));
-		}
+		Camera::handle_keyboard( camera);
 
 		scene.render( camera);
 		scene.draw  ( window);
 		window.display();
-
-		// camera.coords( camera.coords() +  Vector( 5, 5, 5));
 	}
 	
 	return 0;

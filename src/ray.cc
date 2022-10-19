@@ -97,11 +97,10 @@ void Ray::reach( const Sphere *const sphere,  const std::vector<Sphere> &spheres
 {
 	float min_distance = FLT_MAX;
 
-	for ( uint32_t i = 0; i < spheres.size(); i++ )
-	{
-		const Sphere &sphere = spheres[i];
-		const float   radius = sphere.get_radius(); 
-		const Vector  tmp    = origin() - sphere.get_coords();
+	for ( std::vector<Sphere>::const_iterator spheres_it = spheres.begin(); spheres_it != spheres.end(); spheres_it++ )
+	{	
+		const float   radius = spheres_it->get_radius(); 
+		const Vector  tmp    = origin() - spheres_it->get_coords();
 
 		const float a = (dir() & dir());
 	       	const float b = 2 * (dir() & tmp);
@@ -113,7 +112,7 @@ void Ray::reach( const Sphere *const sphere,  const std::vector<Sphere> &spheres
 		if ( roots.numberOfRoots >= 1 && roots.x1 > 0.f && min_distance > roots.x1 )
 		{
 			min_distance = roots.x1;
-			sphere_      = &sphere;
+			sphere_      = &(*spheres_it);
 		}
 	}
 
@@ -126,12 +125,11 @@ void Ray::reach( const Sphere *const sphere,  const std::vector<Sphere> &spheres
 void Ray::intersect( const std::vector<Sphere> &spheres)
 {
 	float min_distance = FLT_MAX;
-
-	for ( uint32_t i = 0; i < spheres.size(); i++ )
+	
+	for ( std::vector<Sphere>::const_iterator spheres_it = spheres.begin(); spheres_it != spheres.end(); spheres_it++ )
 	{
-		const Sphere &sphere = spheres[i];
-		const float   radius = sphere.get_radius(); 
-		const Vector  tmp    = origin() - sphere.get_coords();
+		const float   radius = spheres_it->get_radius(); 
+		const Vector  tmp    = origin() - spheres_it->get_coords();
 
 		const float a = (dir() & dir());
 	       	const float b = 2 * (dir() & tmp);
@@ -143,7 +141,7 @@ void Ray::intersect( const std::vector<Sphere> &spheres)
 		if ( roots.numberOfRoots >= 1 && roots.x1 > 0.f && min_distance > roots.x1 )
 		{
 			min_distance = roots.x1;
-			sphere_      = &sphere;
+			sphere_      = &(*spheres_it);
 		}
 	}
 
@@ -183,12 +181,10 @@ Color Ray::primary( Ray &primary_ray, const std::vector<Sphere> &spheres, const 
 	{
 		color = Color( 0, 0, 0);
 
-		for ( uint32_t i = 0; i < lights.size(); i++ )
+		for ( std::vector<Light>::const_iterator light = lights.begin(); light != lights.end(); light++ )
 		{
-			color += lights[i].colorize( primary_ray, spheres, COLORIZE_FULL);
+			color += light->colorize( primary_ray, spheres, COLORIZE_FULL);
 		}
-
-		//color *= 1 - primary_ray.reached().get_material().albedo();
 	}
 
 	return color;
@@ -212,9 +208,9 @@ Color recursive_secondary( Ray ray, const std::vector<Sphere> &spheres, const st
 		return color;
 	}
 
-	for ( uint32_t i = 0; i < lights.size(); i++ )
+	for ( std::vector<Light>::const_iterator light = lights.begin(); light != lights.end(); light++ )
 	{
-		color += lights[i].colorize( ray, spheres, COLORIZE_DIFFUSE);
+		color += light->colorize( ray, spheres, COLORIZE_DIFFUSE);
 	}
 
 	const float albedo          = ray.reached().get_material().albedo();

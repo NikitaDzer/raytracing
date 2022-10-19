@@ -1,5 +1,8 @@
 #include <stdlib.h>
+#include <assert.h>
 #include <math.h>
+
+#include <unistd.h>
 
 #include "../include/common.h"
 #include "../include/window.h"
@@ -23,16 +26,7 @@ Scene::Scene():
 
 	texture_.create( WINDOW_WIDTH, WINDOW_HEIGHT);
 	sprite_.setTexture( texture_);
-	
-	
-	lights_.push_back( Light( Vector( 200, 100, -300), Color( 255, 255, 255)));
-
-	spheres_.push_back( Sphere( Vector(  200,    0,  300), Material( Color( 255, 255, 255), 0.1f), 200.f));
-	spheres_.push_back( Sphere( Vector( -200,    0,  300), Material( Color( 255, 255, 255), 0.1f), 200.f));
-
-	spheres_.push_back( Sphere( Vector(  0, 100,  100), Material( Color( 0, 255, 255), 0.0f), 50.f));
 }
-
 
 Scene::~Scene()
 {
@@ -62,19 +56,39 @@ void Scene::render_pixel( const uint32_t x, const uint32_t y, const Camera &came
 }
 
 
-/* 
- *
- * ray.reach( spheres);
- * 
- * if ( !ray.infinity() )
- * {
- *	sphere   = ray.reached();
- *	refl_ray = ray.reflect();
- *	
- *
- * }	
- *
- */
+int Scene::add( const Light &light)
+{
+	lights_.push_back( light);
+
+	return lights_.end() - lights_.begin();
+}
+
+int Scene::add( const Sphere &sphere)
+{
+	spheres_.push_back( sphere);
+
+	return spheres_.end() - spheres_.begin();
+}
+
+Light &Scene::get_light( const int index)
+{
+	return *(lights_.begin() + index);
+}
+
+Sphere &Scene::get_sphere( const int index)
+{
+	return *(spheres_.begin() + index);
+}
+
+void Scene::remove_light( const int index)
+{
+	lights_.erase( lights_.begin() + index);	
+}
+
+void Scene::remove_sphere( const int index)
+{
+	spheres_.erase( spheres_.begin() + index);
+}
 
 
 void Scene::render( const Camera &camera)
@@ -86,8 +100,6 @@ void Scene::render( const Camera &camera)
 			render_pixel( x, y, camera);
 		}
 	}
-
-	//lights_[0].set_origin( lights_[0].get_origin() + Vector( 10, 10, 0));
 
 	texture_.update( pixels_);
 }

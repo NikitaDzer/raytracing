@@ -28,6 +28,9 @@ class Camera
 	void move  ( const Vector &vector);
 	
 	Ray emit( const uint32_t x, const uint32_t y) const;
+
+	
+	static void handle_keyboard( Camera &camera);
 };
 
 
