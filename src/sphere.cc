@@ -7,12 +7,12 @@
 
 
 Sphere::Sphere():
-	coords_  (),
+	coords_  (),	
 	material_(),
 	radius_  ( SPHERE_DEFAULT_RADIUS)
 {}
 
-Sphere::Sphere( const Vector &coords, const Color &material, const float radius):
+Sphere::Sphere( const Vector &coords, const Material &material, const float radius):
 	coords_  ( coords),
 	material_( material),
 	radius_  ( radius)
@@ -28,13 +28,13 @@ Sphere::~Sphere()
 {}
 
 
-const Vector &Sphere::get_coords()   const { return coords_;   }
-const Color  &Sphere::get_material() const { return material_; }
-      float   Sphere::get_radius()   const { return radius_;   }
+const Vector   &Sphere::get_coords()   const { return coords_;   }
+const Material &Sphere::get_material() const { return material_; }
+const float    &Sphere::get_radius()   const { return radius_;   }
 
-void Sphere::set_coords  ( const Vector &coords)   { coords_   = coords;   }
-void Sphere::set_material( const Color  &material) { material_ = material; }
-void Sphere::set_radius  ( const float   radius)   { radius_   = radius;   }
+void Sphere::set_coords  ( const Vector   &coords)   { coords_   = coords;   }
+void Sphere::set_material( const Material &material) { material_ = material; }
+void Sphere::set_radius  ( const float     radius)   { radius_   = radius;   }
 
 /*
 bool Sphere::intersect( const Ray &ray, Ray &refl_ray) const 

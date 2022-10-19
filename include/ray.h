@@ -8,9 +8,11 @@
 
 #include "vector.h"
 #include "sphere.h"
+#include "light.h"
 #include "color.h"
 
 
+class Light;
 class Sphere;
 
 class Ray
@@ -74,6 +76,12 @@ class Ray
 
 
 	void print() const;
+
+
+	static Color primary  ( Ray &primary_ray, 
+				const std::vector<Sphere> &spheres, const std::vector<Light> &lights);
+	static Color secondary( const Ray &ray,
+				const std::vector<Sphere> &spheres, const std::vector<Light> &lights);
 };
 
 
